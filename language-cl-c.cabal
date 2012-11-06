@@ -1,0 +1,35 @@
+name:                  language-cl-c
+version:               0.1
+synopsis:              Embedded OpenCL C 
+description:           Provides EDSL for OpenCL C Language deep embedded in Haskell. 
+                       It can be used as backend for runtime code generation in convenient typesafe way.
+license:               MIT
+license-file:          LICENSE
+author:                Sam T.
+maintainer:            Sam T. <sta.cs.vsu@gmail.com>
+copyright:             (c) 2012, Sam T.
+category:              Language
+build-type:            Simple
+cabal-version:         >=1.8
+
+source-repository head
+  type:                git
+  location:            https://github.com/fmap/language-cl-c.git
+
+library
+  exposed-modules:     Language.CL.C
+                       Language.CL.C.CodeGen
+
+--  other-modules:       Data.Scope
+--                       Data.Dependency
+
+  build-depends:       array            == 0.4.*
+                     , base             == 4.5.*
+                     , containers       == 0.4.*
+                     , mtl              == 2.1.*
+                     , pretty           == 1.1.*
+                     , template-haskell == 2.7.*
+                     , vector-space     == 0.8.*
+
+  ghc-options:       -O3 -Wall 
+  ghc-prof-options:  -auto-all
