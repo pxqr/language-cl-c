@@ -1,5 +1,5 @@
 -- | Warning: Funargs are supported partially.
-{-# LANGUAGE GADTs, RankNTypes, KindSignatures, FlexibleInstances, MultiParamTypeClasses #-}
+{-# LANGUAGE GADTs, RankNTypes, KindSignatures, FlexibleInstances, MultiParamTypeClasses, EmptyDataDecls #-}
 module Language.CL.C.HOAS.AST  
        ( Expression, Function, FunctionE, Parameters
        -- * 'Expression' abstract data type constructors
@@ -10,7 +10,7 @@ module Language.CL.C.HOAS.AST
        -- * Block
        , Block, Body
        -- * Basic operations
-       , new, ret, while, (?), assign
+       , new, while, (?), assign, ret, retVoid, CLVoid
        -- * Stripping
        , stripG, StripGlobal, StripError
        ) where
@@ -89,6 +89,11 @@ typeOfExpr :: LangType a => Expression a -> TypeRepr
 typeOfExpr = typeOf . unliftExpression
     where unliftExpression :: Expression a -> a
           unliftExpression = error "typeOfExpr"
+
+instance Parameters () where
+  list a      = return []
+  mkParams    = return ()
+  paramList _ = []
 
 instance (LangType a, ParamType a) => Parameters (Expression a) where
   list a      = return <$> strip a
@@ -173,6 +178,8 @@ ret e = add $ Ret $ Just e
 --  v <- new e
 --  add $ Ret v
 
+data CLVoid 
+
 retVoid :: Body CLVoid
 retVoid = add $ Ret $ Nothing
 
@@ -236,7 +243,7 @@ class StripLocal a b where
   
 class StripGlobal a where
   stripG :: a -> Either StripError (DDN TLDecl)
-p  
+
 instance StripLocal (Expression a) Expr where
   strip (Lit a)       = return $ Literal  $ showLit a
   strip (Var a)       = return $ Variable $ mkVarName variablePrefix a

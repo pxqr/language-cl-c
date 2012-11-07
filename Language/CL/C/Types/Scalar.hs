@@ -59,7 +59,6 @@ instance (CLFractional a, CLNum a) => Fractional (Expression a) where
   fromRational = mkLit . packFractional
 
 --------------------- atom types    -----------------------
-newtype CLVoid = CLVoid ()
 newtype CLBool   = CLBool Bool       
 
 newtype CLChar   = CLChar Integer
