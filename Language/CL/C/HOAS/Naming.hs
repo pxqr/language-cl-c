@@ -13,7 +13,7 @@ import Data.Monoid (mempty)
 -- | 'function' should be used for user-defined functions.
 --   UNSAFE! should be used only inside cl splicing!
 function :: (Parameters a, RetType b) => (a -> Language.CL.C.HOAS.AST.Body b) -> (a -> Expression b)
-function def = mkApp $ mkFun undefined mempty def
+function def = mkApp $ mkFun (error "function") mempty def
 
 
 cl :: Q [Dec] -> Q [Dec]

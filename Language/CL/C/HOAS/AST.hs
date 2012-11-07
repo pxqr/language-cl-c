@@ -77,9 +77,9 @@ mkApp = App
 
 -- | UNSAFE!
 unsafeUnApp :: (Parameters a) => (a -> Expression b) -> Function a b
-unsafeUnApp fun = case fun undefined of
+unsafeUnApp fun = case fun $ error "unsafeUnApp:1" of
                     App (Fun d) _ -> Fun d
-                    _             -> error "unsafeUnApp"
+                    _             -> error "unsafeUnApp:2"
 
 mkParam :: ParamType a => Block r a
 mkParam = Var <$> freshIndex
@@ -88,7 +88,7 @@ mkParam = Var <$> freshIndex
 typeOfExpr :: LangType a => Expression a -> TypeRepr
 typeOfExpr = typeOf . unliftExpression
     where unliftExpression :: Expression a -> a
-          unliftExpression = undefined
+          unliftExpression = error "typeOfExpr"
 
 instance (LangType a, ParamType a) => Parameters (Expression a) where
   list a      = return <$> strip a
