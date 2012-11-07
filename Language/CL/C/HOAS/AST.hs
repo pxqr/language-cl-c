@@ -1,7 +1,7 @@
 -- | Warning: Funargs are supported partially.
 {-# LANGUAGE GADTs, RankNTypes, KindSignatures, FlexibleInstances, MultiParamTypeClasses #-}
 module Language.CL.C.HOAS.AST  
-       ( Expression, Function, Parameters
+       ( Expression, Function, FunctionE, Parameters
        -- * 'Expression' abstract data type constructors
        , mkLit, mkVar, mkApp, unsafeUnApp, mkFun
        , mkFunarg, Funargs(Funargs), addFunargs, setName

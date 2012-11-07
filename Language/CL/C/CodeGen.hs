@@ -7,7 +7,8 @@ module Language.CL.C.CodeGen
 
 import Language.CL.C.CodeGen.Pretty   (document, showCode)
 import Language.CL.C.CodeGen.ProgRepr (Program(Program), TLDecl, identifier) 
-import Language.CL.C.HOAS.AST         (mkVar, mkApp, mkFun, mkLit, mkFunarg, Funargs(Funargs)
+import Language.CL.C.HOAS.AST         ( mkVar, mkApp, mkLit
+                                      , mkFun, mkFunarg, Funargs(Funargs), FunctionE, Function
                                       , StripGlobal, StripError, stripG)
 
 import Data.Dependencies              (Recursion, resolveSD, prune, showError)
