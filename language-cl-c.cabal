@@ -20,8 +20,22 @@ library
   exposed-modules:     Language.CL.C
                        Language.CL.C.CodeGen
 
---  other-modules:       Data.Scope
---                       Data.Dependency
+  other-modules:       Data.Scope
+                       Data.Dependencies
+
+                       Language.CL.C.Types
+                       Language.CL.C.Types.Classes
+                       Language.CL.C.Types.Scalar
+                       Language.CL.C.Types.Vector
+                       Language.CL.C.Types.Pointer
+--                       Language.CL.C.CodeGen
+                       Language.CL.C.CodeGen.Mangling
+                       Language.CL.C.CodeGen.Pretty
+                       Language.CL.C.CodeGen.ProgRepr
+                       Language.CL.C.CodeGen.TypeRepr
+                       Language.CL.C.HOAS.AST
+                       Language.CL.C.HOAS.Naming
+                       Language.CL.C.HOAS.Sugar
 
   build-depends:       array            == 0.4.*
                      , base             == 4.5.*
