@@ -7,12 +7,12 @@ module Language.CL.C.CodeGen.ProgRepr
        , Program(..)
        ) where
 
-import Language.CL.C.CodeGen.Mangling
+--import Language.CL.C.CodeGen.Mangling
 import Language.CL.C.CodeGen.TypeRepr
 import Language.CL.C.CodeGen.Pretty
 
 import Data.Monoid               (Monoid)
-import Data.List                 (intersperse, intercalate)
+import Data.List                 (intersperse)
 import Text.PrettyPrint.HughesPJ (Doc, empty, text, char, nest, punctuate, parens, vcat, hcat, hsep
                                  , equals, semi, comma, space, lbrace, rbrace
                                  , ($+$), ($$), (<+>), (<>))
@@ -32,7 +32,7 @@ data Expr = Funcall Signature [Expr]
 data Statement = Definition TypeRepr Identifier (Maybe Expr)
                | Assignment Expr Expr
                | WhileLoop  Expr CompoundStatement
-               | Return Expr
+               | Return (Maybe Expr)
 
 data CompoundStatement = CompoundStatement [Statement]
 

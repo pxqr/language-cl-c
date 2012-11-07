@@ -151,7 +151,7 @@ mkBuiltInUOp name = mkApp (Fun $ BuiltIn $ UOP name)
 mkBuiltInBOp :: (ParamType a, ParamType b, RetType c) => Identifier -> Expression a -> Expression b -> Expression c
 mkBuiltInBOp name lhs rhs = mkApp (Fun $ BuiltIn $ BOP name) (lhs, rhs)
 
-data Claim r = Ret (Expression r)
+data Claim r = Ret (Maybe (Expression r))
              | forall a. LangType a => Def Index (Expression a) 
              | forall a. BoolLike a => While (Expression a) (Body r)
              | forall a. LangType a => Assign (Expression a) (Expression a)
@@ -168,12 +168,15 @@ new = mkVar
 
 -- | 
 ret :: LangType r => Expression r -> Body r
-ret e = add $ Ret e
+ret e = add $ Ret $ Just e
 -- or maybe this?
 --  v <- new e
 --  add $ Ret v
 
--- |
+retVoid :: Body CLVoid
+retVoid = add $ Ret $ Nothing
+
+-- | While loop.
 while :: BoolLike b => Expression b -> Body r -> Body r
 while cond blk  = add $ While cond blk
 
@@ -233,7 +236,7 @@ class StripLocal a b where
   
 class StripGlobal a where
   stripG :: a -> Either StripError (DDN TLDecl)
-  
+p  
 instance StripLocal (Expression a) Expr where
   strip (Lit a)       = return $ Literal  $ showLit a
   strip (Var a)       = return $ Variable $ mkVarName variablePrefix a
@@ -258,6 +261,9 @@ instance StripLocal (Expression a) Expr where
 
 instance Parameters a => StripLocal a [Expr] where
   strip = list
+
+instance StripLocal a b => StripLocal (Maybe a) (Maybe b) where
+  strip a = maybe (return Nothing) (fmap Just . strip) a
 
 instance StripLocal (Claim r) Statement where
   strip (Ret e)      = Return <$> strip e
