@@ -26,11 +26,6 @@ ref = mkBuiltInUOp "&"
 deref :: RetType a => Expression (Pointer a) -> Expression a
 deref = mkBuiltInUOp "*"
 
-(=:) :: (LangType a, RetType a) => Expression (Pointer a) -> Expression a -> Body r
-ptr =: val = assign (deref ptr) val
-
-infixr 0 =:
-
 (*+*) :: LangType a => Expression (Pointer a) -> Expression CLSize -> Expression (Pointer a) 
 (*+*) = mkBuiltInBOp "+"
 

@@ -12,7 +12,7 @@ import Language.CL.C.Types.Vector
 import Language.CL.C.Types.Pointer
 import Language.CL.C.Types.Classes
 
-import Language.CL.C.HOAS.AST
+import Language.CL.C.HOAS.AST ()
 
 {-
 class CLFunctor f where

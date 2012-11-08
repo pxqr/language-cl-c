@@ -10,7 +10,7 @@ module Language.CL.C.HOAS.AST
        -- * Block
        , Block, Body
        -- * Basic operations
-       , new, while, (?), assign, ret, retVoid, CLVoid
+       , new, while, (?), (=:), ret, retVoid, CLVoid
        -- * Stripping
        , stripG, StripGlobal, StripError
        ) where
@@ -91,7 +91,7 @@ typeOfExpr = typeOf . unliftExpression
           unliftExpression = error "typeOfExpr"
 
 instance Parameters () where
-  list a      = return []
+  list _      = return []
   mkParams    = return ()
   paramList _ = []
 
@@ -158,8 +158,14 @@ mkBuiltInBOp name lhs rhs = mkApp (Fun $ BuiltIn $ BOP name) (lhs, rhs)
 
 data Claim r = Ret (Maybe (Expression r))
              | forall a. LangType a => Def Index (Expression a) 
-             | forall a. BoolLike a => While (Expression a) (Body r)
              | forall a. LangType a => Assign (Expression a) (Expression a)
+             | forall a. BoolLike a => While (Expression a) (Body r)
+             | forall a b. (LangType a, BoolLike b) => RangeFor 
+               (Expression a)                -- index variable
+               (Expression a)                -- initial value
+               (Expression a -> Expression b) -- condition
+               (Expression a -> Expression a) -- index transformation
+               (Body r)                      -- loop body
 
 -- | /r/ is return type, /a/ is definition type. 
 --   /r/ type variable helpfull to restrict return type to only one,
@@ -186,12 +192,26 @@ retVoid = add $ Ret $ Nothing
 -- | While loop.
 while :: BoolLike b => Expression b -> Body r -> Body r
 while cond blk  = add $ While cond blk
-
+{-
+for :: (LangType a, BoolLike b) => 
+       Expression a                    -- initial value
+       -> (Expression a -> Expression b) -- break condition
+       -> (Expression a -> Expression a) -- index transformation
+       -> (Expression a -> Body r)       -- loop body
+       -> (Body r)
+for ival cond act body = do i <- mkVar
+                            add $ RangeFor i ival cond act $ body i
+-}
 (?) :: (ParamType a, ParamType b, RetType a, BoolLike b) => Expression b -> Expression a -> Expression a -> Expression a
 (?) cond right left = mkApp (Fun $ BuiltIn TOP) (cond, right, left)
 
 assign :: LangType a => Expression a -> Expression a -> Body r
 assign p q = add $ Assign p q
+
+(=:) :: (LangType a, RetType a) => Expression a -> Expression a -> Body r
+(=:) = assign
+
+infixr 0 =:
 
 ------------------------------------- Stripping ---------------------------------------------
 ------------------------------ TODO: PRETIFY THIS PART!!! -----------------------------------
