@@ -10,7 +10,7 @@ module Language.CL.C.HOAS.AST
        -- * Block
        , Block, Body
        -- * Basic operations
-       , new, while, (?), (=:), ret, retVoid, CLVoid
+       , new, sequen, while, (?), (=:), ret, retVoid, CLVoid
        -- * Stripping
        , stripG, StripGlobal, StripError
        ) where
@@ -158,6 +158,7 @@ mkBuiltInBOp name lhs rhs = mkApp (Fun $ BuiltIn $ BOP name) (lhs, rhs)
 
 data Claim r = Ret (Maybe (Expression r))
              | forall a. LangType a => Def Index (Expression a) 
+             | forall a. LangType a => Seq (Expression a)
              | forall a. LangType a => Assign (Expression a) (Expression a)
              | forall a. BoolLike a => While (Expression a) (Body r)
              | forall a b. (LangType a, BoolLike b) => RangeFor 
@@ -177,9 +178,12 @@ type Body r    = Scope (Claim r) ()
 new :: LangType a => Expression a -> Block r a
 new = mkVar
 
+sequen :: LangType a => Expression a -> Body r
+sequen = add . Seq 
+
 -- | 
 ret :: LangType r => Expression r -> Body r
-ret e = add $ Ret $ Just e
+ret = add . Ret . Just
 -- or maybe this?
 --  v <- new e
 --  add $ Ret v
@@ -275,7 +279,7 @@ instance StripLocal (Expression a) Expr where
   -- UNSAFE!!! But it's impossible to construct unary op with two pars or ..e.t.c
     where handleStyle :: Domain a -> [Expr] -> Expr
           handleStyle (Embedded _       _  _)           e = Funcall (mkSignature fun) e
-          handleStyle (BuiltIn (Ordinary _))            e = Funcall (mkSignature fun) e
+          handleStyle (BuiltIn (Ordinary iden))         e = FuncallB iden e
           handleStyle (BuiltIn (UOP      name)) (a:_)     = UnaryOp  name a
           handleStyle (BuiltIn (BOP      name)) (a:b:_)   = BinaryOp name a b
           handleStyle (BuiltIn (TOP          )) (a:b:c:_) = TernaryOp a b c
@@ -293,6 +297,7 @@ instance StripLocal a b => StripLocal (Maybe a) (Maybe b) where
   strip a = maybe (return Nothing) (fmap Just . strip) a
 
 instance StripLocal (Claim r) Statement where
+  strip (Seq e)      = Sequence <$> strip e
   strip (Ret e)      = Return <$> strip e
   strip (Def i e)    = Definition (typeOfExpr e) (mkVarName variablePrefix i) . Just <$> strip e
   strip (While c b)  = WhileLoop <$> strip c <*> strip b

@@ -23,6 +23,7 @@ import Data.Ord (comparing)
 type Identifier = String
 
 data Expr = Funcall Signature [Expr] 
+          | FuncallB Identifier [Expr]
           | UnaryOp Identifier Expr
           | BinaryOp  Identifier Expr Expr
           | TernaryOp Expr Expr Expr
@@ -30,6 +31,7 @@ data Expr = Funcall Signature [Expr]
           | Literal String
 
 data Statement = Definition TypeRepr Identifier (Maybe Expr)
+               | Sequence   Expr
                | Assignment Expr Expr
                | WhileLoop  Expr CompoundStatement
                | Return (Maybe Expr)
@@ -96,20 +98,22 @@ instance Pretty Parameter where
 instance Pretty ParList where
   document (ParList xs) = parens $ hsep $ punctuate comma $ map document xs
 
+argList :: Pretty a => [a] -> Doc
+argList = hsep . punctuate comma . map document 
+
 instance Pretty Expr where
   document (Literal  name)      = text name
   document (Variable name)      = text name
   document (UnaryOp name a)     = parens (text name <+> document a)
   document (BinaryOp name p q)  = parens (document p <+> text name <+> document q)
   document (TernaryOp cond p q) = parens (document cond <+> text "?" <+> document p <+> text ":" <+> document q)
-  document (Funcall sig args)   = mangleFunName sig <> parens argList
-    where argList = hsep $ punctuate comma $ map document args
-
-
+  document (Funcall sig args)   = mangleFunName sig <> parens (argList args)
+  document (FuncallB iden args) = text iden <> parens (argList args)
   
 instance Pretty Statement where
   document (Definition tpe name expr) = document tpe <+> text name 
                                         <> maybe empty ((space <> equals <+>) . document) expr <> semi 
+  document (Sequence expr)            = document expr <> semi
   document (Return e)                 = text "return" <+> document e <> semi
   document (Assignment p expr)        = document p <+> equals  <+> document expr <> semi
   document (WhileLoop cond block)     = text "while" <> parens (document cond) $+$ document block

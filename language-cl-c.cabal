@@ -36,6 +36,7 @@ library
                        Language.CL.C.HOAS.AST
                        Language.CL.C.HOAS.Naming
                        Language.CL.C.HOAS.Sugar
+                       Language.CL.C.StdLib
 
   build-depends:       array            == 0.4.*
                      , base             == 4.5.*
